@@ -1,7 +1,7 @@
-from ultralytics import YOLO
 import cv2
 import cvzone
 import math
+from ultralytics import YOLO
 
 cap = cv2.VideoCapture(0)
 cap.set(3, 1280)
