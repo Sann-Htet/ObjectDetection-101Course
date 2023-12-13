@@ -14,13 +14,17 @@ with open(classFile, 'rt') as f:
 
 model = YOLO('ObjectDetectionYOLO/Yolo-weights/yolov8n.pt')
 
-mask = cv2.imread("Project-1_CarCounter/mask_resize.png")
+mask = cv2.imread("Project-2_PeopleCounter/mask_resize.png")
 
 # Tracking
 tracker = Sort(max_age=20, min_hits=3, iou_threshold=0.3)
 
-limits = [400, 297, 673, 297]
-totalCount = []
+limitsUp = [103, 161, 296, 161]
+limitsDown = [527, 489, 735, 489]
+
+totalCountUp = []
+totalCountDown = []
+
 
 while True:
     success, img = cap.read()
@@ -56,7 +60,8 @@ while True:
 
     resultsTracker = tracker.update(detections)
 
-    cv2.line(img, (limits[0], limits[1]), (limits[2], limits[3]), (0, 0, 255), 5)
+    cv2.line(img, (limitsUp[0], limitsUp[1]), (limitsUp[2], limitsUp[3]), (0, 0, 255), 5)
+    cv2.line(img, (limitsDown[0], limitsDown[1]), (limitsDown[2], limitsDown[3]), (0, 0, 255), 5)
 
     for result in resultsTracker:
         x1, y1, x2, y2, id = result
@@ -67,14 +72,21 @@ while True:
         cx, cy = x1 + w // 2, y1 + h // 2
         cv2.circle(img, (cx, cy), 5, (255, 0, 255), cv2.FILLED)
 
-        if limits[0] < cx < limits[2] and limits[1] - 15 < cy < limits[1] + 15:
-            if totalCount.count(id) == 0:
-                totalCount.append(id)
-                cv2.line(img, (limits[0], limits[1]), (limits[2], limits[3]), (0, 255, 0), 5)
+        if limitsUp[0] < cx < limitsUp[2] and limitsUp[1] - 15 < cy < limitsUp[1] + 15:
+            if totalCountUp.count(id) == 0:
+                totalCountUp.append(id)
+                cv2.line(img, (limitsUp[0], limitsUp[1]), (limitsUp[2], limitsUp[3]), (0, 255, 0), 5)
+
+        if limitsDown[0] < cx < limitsDown[2] and limitsDown[1] - 15 < cy < limitsDown[1] + 15:
+            if totalCountDown.count(id) == 0:
+                totalCountDown.append(id)
+                cv2.line(img, (limitsDown[0], limitsDown[1]), (limitsDown[2], limitsDown[3]), (0, 255, 0), 5)
             
-    # cvzone.putTextRect(img, f'Count: {len(totalCount)}', (50, 50))
+    # # cvzone.putTextRect(img, f'Count: {len(totalCount)}', (50, 50))
         
-    cv2.putText(img, str(len(totalCount)), (255, 100), cv2.FONT_HERSHEY_PLAIN, 5, (50, 50, 255), 8)
+    cv2.putText(img, str(len(totalCountUp)), (929, 345), cv2.FONT_HERSHEY_PLAIN, 5, (139, 195, 75), 7)
+    cv2.putText(img, str(len(totalCountDown)), (1191, 345), cv2.FONT_HERSHEY_PLAIN, 5, (50, 50, 230), 7)
+
 
     cv2.imshow("Image", img)
     # cv2.imshow("Image Region", imgRegion)
